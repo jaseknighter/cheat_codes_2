@@ -117,7 +117,7 @@ function Patterning:set_tick(i)
 end
 
 function Patterning:advance_tick()
-  self:set_tick(self:get_tick + 1)
+  self:set_tick(self:get_tick() + 1)
   if self.event[self:get_tick()] ~= nil then
     self.process(self.event[self:get_tick()])
   end
