@@ -704,6 +704,11 @@ local mx_dests ={
 
 function mc.midi_note_from_pad(b,p)
   if bank[b][p].crow_pad_execute == 1 then
+    if params:get("wdel_freq_del_enbl") == 2 then
+      
+    end
+
+
     if params:string(b.."_pad_to_midi_note_enabled") == "yes" then
       if mc.get_midi("midi_notes",b,p) ~= "-" and mc.get_midi("midi_notes_velocities",b,p) ~= "-" and mc.get_midi("midi_notes_channels",b,p) ~= "-" then
         mc.all_midi_notes_off(b)
@@ -740,6 +745,8 @@ function mc.midi_note_from_pad(b,p)
       }
       if params:string(b.."_pad_to_jf_note_enabled") ~= "none" then
         local note_num = mc_notes[b][p] - 60
+
+
         local velocity = params:get(b.."_pad_to_jf_note_velocity")
         if params:string(b.."_pad_to_jf_note_enabled") == "any" then
           crow.ii.jf.play_note(note_num/12,velocity)
@@ -753,12 +760,18 @@ function mc.midi_note_from_pad(b,p)
       if params:string(b.."_pad_to_wsyn_note_enabled") ~= "none" then
         local note_num = mc_notes[b][p] - 60
         local velocity = util.linlin(0,127,0,5,params:get(b.."_pad_to_wsyn_note_velocity"))
-        if params:string(b.."_pad_to_wsyn_note_enabled") == "any" then
+        if params:get("wdel_freq_del_enbl") == 2 and mc.last_note_num then 
+          crow.ii.wsyn.play_note(mc.last_note_num/12,velocity)
+        elseif params:string(b.."_pad_to_wsyn_note_enabled") == "any" then
           crow.ii.wsyn.play_note(note_num/12,velocity)
         else
           local wsyn_chan = params:get(b.."_pad_to_wsyn_note_enabled") - 1
           crow.ii.wsyn.play_voice(wsyn_chan,note_num/12,velocity)
         end
+        -- print(note_num,note_num/12)
+        clock.run(mc.set_w_del_freq,(note_num)/12)
+        mc.last_note_num = note_num
+
       end
     end
     if params:string(b.."_pad_to_crow_v-8") ~= "none" then
@@ -792,6 +805,13 @@ function mc.midi_note_from_pad(b,p)
       end
     end
   end
+end
+
+function mc.set_w_del_freq(freq)
+  -- print("wdel_freq_del",params:get("wdel_freq_del"))
+  clock.sleep(params:get("wdel_freq_del"))
+  -- params:set("wdel_rate",freq)
+  params:set("wdel_frequency",freq)
 end
 
 function mc.midi_note_from_pad_off(b,p)

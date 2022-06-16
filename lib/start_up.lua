@@ -652,11 +652,16 @@ params:add_separator("ALT key")
     params:add_option("rate "..i, "rate "..banks[i], macros.pad_rates, tab.key(macros.pad_rates,macros.default_pad_rate))
     params:set_action("rate "..i, function(x)
       x = util.clamp(1,#macros.pad_rates,util.round(x))
-      for p = (grid_alt and 1 or bank[i].id),(grid_alt and 16 or bank[i].id) do
-        bank[i][p].rate = macros.pad_rates[x]
-      end
+      -- commented out for non-destructive changes to rate
+      -- for p = (grid_alt and 1 or bank[i].id),(grid_alt and 16 or bank[i].id) do
+      --   bank[i][p].rate = macros.pad_rates[x]
+      -- end
+      -- if bank[i][bank[i].id].pause == false then
+      --   softcut.rate(i+1, bank[i][bank[i].id].rate*bank[i][bank[i].id].offset)
+      -- end
+
       if bank[i][bank[i].id].pause == false then
-        softcut.rate(i+1, bank[i][bank[i].id].rate*bank[i][bank[i].id].offset)
+        softcut.rate(i+1, macros.pad_rates[x]*bank[i][bank[i].id].offset)
       end
     end)
     params:add_control("rate slew time "..i, "rate slew time "..banks[i], controlspec.new(0,3,'lin',0.01,0))

@@ -75,6 +75,7 @@ UI = require "ui"
 lattice = require "lattice"
 fileselect = require 'fileselect'
 textentry = require 'textentry'
+cs = require "controlspec"
 main_menu = include 'lib/main_menu'
 encoder_actions = include 'lib/encoder_actions'
 arc_actions = include 'lib/arc_actions'
@@ -91,6 +92,8 @@ mc = include 'lib/midicheat'
 macros = include 'lib/macros'
 transport = include 'lib/transport'
 speed_dial = include 'lib/speed_dial'
+w_slash = include 'lib/w_slash'
+
 math.randomseed(os.time())
 variable_fade_time = 0.01
 splash_done = true
@@ -1513,6 +1516,13 @@ function init()
   end
 
   mc.pad_to_note_params()
+
+  params:add_group("w/del",17)
+  w_slash.wdel_add_params()
+
+  params:add_group("w/tape",17)
+  w_slash.wtape_add_params()
+
 
   params:add_separator("meta")
 
@@ -6012,7 +6022,7 @@ function named_loadstate(path)
         delay[i] = tab.load(_path.data .. "cheat_codes_2/collection-"..collection.."/delays/delay"..(i == 1 and "L" or "R")..".data")
         if util.file_exists(_path.data .. "cheat_codes_2/collection-"..collection.."/delays/delay_bundle"..(i == 1 and "L" or "R")..".data") then
           delay_bundle[i] = tab.load(_path.data .. "cheat_codes_2/collection-"..collection.."/delays/delay_bundle"..(i == 1 and "L" or "R")..".data")
-          if delay_bundle[i][delay[i].selected_bundle].saved then
+          if delay_bundle[i][delay[i].selected_bundle] and delay_bundle[i][delay[i].selected_bundle].saved then
             del.restore_bundle(i,delay[i].selected_bundle)
           end
         end
